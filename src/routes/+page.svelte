@@ -1,21 +1,15 @@
-<script lang>
-  /**
-   * @type {string[]}
-   */
-  let uploadedImages = [];
+<script lang="ts">
+  let uploadedImages: string[] = [];
 
-  /**
- * @param {Event} event
- */
-function handleUpload(event) {
-  const input = /** @type {HTMLInputElement} */ (event.target);
-  const files = Array.from(input.files || []);
-  uploadedImages = files.map(file => URL.createObjectURL(file));
-}
+  function handleUpload(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const files = Array.from(input.files ?? []);
+    uploadedImages = files.map(file => URL.createObjectURL(file));
+  }
 
-  const tiers = ['S', 'A', 'B', 'C', 'D', 'E', 'F', 'G'];
+  const tiers: string[] = ['S', 'A', 'B', 'C', 'D'];
 
-  function getTierColor(index) {
+  function getTierColor(index: number): string {
     const hue = (index * 35) % 360;
     return `hsl(${hue}, 70%, 65%)`;
   }
@@ -26,19 +20,19 @@ function handleUpload(event) {
 <!-- Tier rows -->
 <div class="flex flex-col">
   {#each tiers as label, i}
-  <div class="grid grid-cols-[80px_1fr] h-24 border border-black">
-    <div
-      class="flex items-center justify-center text-xl font-bold text-gray-800"
-      style="background-color: {getTierColor(i)}"
-    >
-      {label}
+    <div class="grid grid-cols-[80px_1fr] h-24 border border-black">
+      <div
+        class="flex items-center justify-center text-xl font-bold text-gray-800"
+        style="background-color: {getTierColor(i)}"
+      >
+        {label}
+      </div>
+      <div class="bg-neutral-900 border-l border-black p-2 flex items-center gap-2 overflow-x-auto">
+        <!-- Dropped items will go here -->
+        <p class="text-gray-500 italic">Drop items here...</p>
+      </div>
     </div>
-    <div class="bg-neutral-900 border-l border-black p-2 flex items-center gap-2 overflow-x-auto">
-      <!-- Dropped items will go here -->
-      <p class="text-gray-500 italic">Drop items here...</p>
-    </div>
-  </div>
-{/each}
+  {/each}
 </div>
 
 <!-- Uploaded items box -->
