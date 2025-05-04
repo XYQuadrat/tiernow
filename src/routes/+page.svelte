@@ -15,12 +15,12 @@
   }
 </script>
 
-<h1 class="text-3xl font-bold text-center mb-6">Tierlist Creator</h1>
+<h1 class="text-3xl font-bold text-center my-6">Tierlist Creator</h1>
 
 <!-- Tier rows -->
-<div class="flex flex-col">
+<div class="flex flex-col mx-4 divide-y-2 border-y-2">
   {#each tiers as label, i}
-    <div class="grid grid-cols-[80px_1fr] h-24 border border-black">
+    <div class="grid grid-cols-[90px_1fr] h-24">
       <div
         class="flex items-center justify-center text-xl font-bold text-gray-800"
         style="background-color: {getTierColor(i)}"
@@ -36,7 +36,7 @@
 </div>
 
 <!-- Uploaded items box -->
-<div class="mt-8 border-2 border-dashed border-gray-400 rounded-lg p-4 mb-6 min-h-[120px] bg-gray-50">
+<div class="mt-8 mx-4 border-2 border-dashed border-gray-400 rounded-lg p-4 mb-6 min-h-[120px] bg-gray-50">
   <h2 class="text-lg font-semibold mb-2">Uploaded Items</h2>
   <div class="flex flex-wrap gap-4">
     {#if uploadedImages.length === 0}
