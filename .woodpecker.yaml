@@ -1,0 +1,13 @@
+when:
+  - event: push
+    branch: [main, setup-woodpecker-ci]
+
+steps:
+  - name: build
+    image: docker.io/oven/bun:debian
+    commands:
+      - bun install --frozen-lockfile
+      - bun run build
+      - cp -TR build /tmp/output
+    volumes:
+      - /srv/tiernow:/tmp/output
