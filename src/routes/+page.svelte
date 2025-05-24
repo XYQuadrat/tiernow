@@ -1,13 +1,19 @@
 <script lang="ts">
-	let uploadedImages: string[] = [];
+	type TierImage = { id: string; src: string };
+	const tiers: string[] = ['S', 'A', 'B', 'C', 'D'];
+
+	let uploadedImages: TierImage[] = [];
+	let tierItems: TierImage[][] = tiers.map(() => []);
 
 	function handleUpload(event: Event) {
 		const input = event.target as HTMLInputElement;
 		const files = Array.from(input.files ?? []);
-		uploadedImages = files.map((file) => URL.createObjectURL(file));
+		const newImages = files.map((file) => ({
+			id: crypto.randomUUID(),
+			src: URL.createObjectURL(file)
+		}));
+		uploadedImages = [...uploadedImages, ...newImages];
 	}
-
-	const tiers: string[] = ['S', 'A', 'B', 'C', 'D'];
 
 	function getTierColor(index: number): string {
 		const hue = (index * 35) % 360;
@@ -46,7 +52,7 @@
 		{:else}
 			{#each uploadedImages as image}
 				<img
-					src={image}
+					src={image.src}
 					alt="uploaded item"
 					class="h-16 w-16 rounded object-cover"
 					draggable="true"
