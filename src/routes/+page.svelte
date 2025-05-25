@@ -54,14 +54,14 @@
 	}
 </script>
 
-<h1 class="my-6 text-center text-3xl font-bold">Tierlist Creator</h1>
+<h1 class="my-6 text-center text-3xl font-bold select-none">Tierlist Creator</h1>
 
 <!-- Tier rows -->
 <div class="mx-4 flex flex-col divide-y-2 border-y-2">
 	{#each tiers as label, i}
 		<div class="grid h-24 grid-cols-[90px_1fr]">
 			<div
-				class="flex items-center justify-center text-xl font-bold text-gray-800"
+				class="flex items-center justify-center text-xl font-bold text-gray-800 select-none"
 				style="background-color: {getTierColor(i)}"
 			>
 				{label}
@@ -74,7 +74,7 @@
 				on:drop={() => handleDrop(i)}
 			>
 				{#if tierItems[i].length === 0}
-					<p class="text-gray-500 italic">Drop items here...</p>
+					<p class="text-gray-500 italic select-none">Drop items here...</p>
 				{:else}
 					{#each tierItems[i] as image}
 						<img
@@ -98,10 +98,10 @@
 	on:dragover={allowDrop}
 	on:drop={() => handleDrop('uploaded')}
 >
-	<h2 class="mb-2 text-lg font-semibold">Uploaded Items</h2>
+	<h2 class="mb-2 text-lg font-semibold select-none">Uploaded Items</h2>
 	<div class="flex flex-wrap gap-4">
 		{#if uploadedImages.length === 0}
-			<p class="text-gray-500 italic">No images uploaded yet.</p>
+			<p class="text-gray-500 italic select-none">No images uploaded yet.</p>
 		{:else}
 			{#each uploadedImages as image}
 				<img
@@ -119,7 +119,7 @@
 <!-- Upload button -->
 <div class="mt-8 text-center">
 	<label
-		class="inline-block cursor-pointer rounded bg-sky-500 px-4 py-2 font-bold text-white hover:bg-sky-700"
+		class="inline-block cursor-pointer rounded bg-sky-500 px-4 py-2 font-bold text-white select-none hover:bg-sky-700"
 	>
 		Upload Image
 		<input type="file" accept="image/*" multiple class="hidden" on:change={handleUpload} />
