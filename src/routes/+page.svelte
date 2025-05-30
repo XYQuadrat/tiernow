@@ -73,19 +73,17 @@
 				on:dragover={allowDrop}
 				on:drop={() => handleDrop(i)}
 			>
-				{#if tierItems[i].length === 0}
-					<p class="text-gray-500 italic select-none">Drop items here...</p>
+				{#each tierItems[i] as image}
+					<img
+						src={image.src}
+						alt="tier item"
+						class="h-16 w-16 rounded object-cover"
+						draggable="true"
+						on:dragstart={() => handleDragStart(image, i)}
+					/>
 				{:else}
-					{#each tierItems[i] as image}
-						<img
-							src={image.src}
-							alt="tier item"
-							class="h-16 w-16 rounded object-cover"
-							draggable="true"
-							on:dragstart={() => handleDragStart(image, i)}
-						/>
-					{/each}
-				{/if}
+					<p class="text-gray-500 italic select-none">Drop items here...</p>
+				{/each}
 			</div>
 		</div>
 	{/each}
@@ -100,19 +98,17 @@
 >
 	<h2 class="mb-2 text-lg font-semibold select-none">Uploaded Items</h2>
 	<div class="flex flex-wrap gap-4">
-		{#if uploadedImages.length === 0}
-			<p class="text-gray-500 italic select-none">No images uploaded yet.</p>
+		{#each uploadedImages as image}
+			<img
+				src={image.src}
+				alt="uploaded item"
+				class="h-16 w-16 rounded object-cover"
+				draggable="true"
+				on:dragstart={() => handleDragStart(image, 'uploaded')}
+			/>
 		{:else}
-			{#each uploadedImages as image}
-				<img
-					src={image.src}
-					alt="uploaded item"
-					class="h-16 w-16 rounded object-cover"
-					draggable="true"
-					on:dragstart={() => handleDragStart(image, 'uploaded')}
-				/>
-			{/each}
-		{/if}
+			<p class="text-gray-500 italic select-none">No images uploaded yet.</p>
+		{/each}
 	</div>
 </div>
 
