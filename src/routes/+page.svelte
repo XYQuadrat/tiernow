@@ -77,7 +77,7 @@
 					<img
 						src={image.src}
 						alt="tier item"
-						class="h-16 w-16 rounded object-cover"
+						class="h-16 w-16 cursor-pointer rounded object-cover"
 						draggable="true"
 						on:dragstart={() => handleDragStart(image, i)}
 					/>
@@ -102,7 +102,7 @@
 			<img
 				src={image.src}
 				alt="uploaded item"
-				class="h-16 w-16 rounded object-cover"
+				class="h-16 w-16 cursor-pointer rounded object-cover"
 				draggable="true"
 				on:dragstart={() => handleDragStart(image, 'uploaded')}
 			/>
