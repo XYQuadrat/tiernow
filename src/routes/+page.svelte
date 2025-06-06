@@ -10,9 +10,22 @@
 	let draggedImage: TierImage | null = null;
 	let draggedFrom: SourceType | null = null;
 
-	function handleUpload(event: Event) {
+	async function handleUpload(event: Event) {
 		const input = event.target as HTMLInputElement;
 		const files = Array.from(input.files ?? []);
+		for (const file of files) {
+			const formData = new FormData()
+			formData.append('image', file)
+
+			try {
+				const response = await fetch('https://xyquadrat.ch/tiernow/api/upload', {
+					method: 'POST',
+					body: formData
+				})
+			} catch (err) {
+				console.error(err);
+			}
+		}
 		const newImages = files.map((file) => ({
 			id: crypto.randomUUID(),
 			src: URL.createObjectURL(file)
