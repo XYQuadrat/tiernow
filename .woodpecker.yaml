@@ -1,9 +1,9 @@
 when:
   - event: push
-    branch: main
+    branch: [main, s3-backend]
 
 steps:
-  - name: build
+  - name: Build and deploy frontend
     image: docker.io/oven/bun:debian
     commands:
       - bun install --frozen-lockfile
@@ -11,3 +11,10 @@ steps:
       - cp -TR build /tmp/output
     volumes:
       - /srv/tiernow:/tmp/output
+  - name: Build and deploy backend
+    image: docker.io/golang:1.24.3
+    commands:
+      - cd backend
+      - go build -o /deploy/image-api .
+    volumes:
+      - /srv/tiernow-backend:/deploy
