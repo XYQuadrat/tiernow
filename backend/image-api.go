@@ -73,6 +73,7 @@ func uploadToS3(w http.ResponseWriter, file multipart.File, key string, contentT
 		return
 	}
 
+	log.Printf("Uploaded new file to %v", key)
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(key))
 }
@@ -106,7 +107,7 @@ func main() {
 	initializeS3()
 
 	r := mux.NewRouter()
-	r.HandleFunc("/upload", uploadHandler).Methods("POsT")
+	r.HandleFunc("/upload", uploadHandler).Methods("POST")
 	r.HandleFunc("/images/{key}", retrieveHandler).Methods("GET")
 
 	port := "5452"
