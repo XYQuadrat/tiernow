@@ -1,57 +1,82 @@
 <script lang="ts">
-	type TierImage = { id: string; src: string };
+	import { onMount } from "svelte";
+	import type { PageProps } from "./$types";
+	import { PUBLIC_API_URL } from "$env/static/public";
+
+	let { data } : PageProps = $props();
+
+	let tierlistId: string = $state('');
+	let tierlistName: string = $state('');
+
+	type TierImage = { id: Number, src: string };
+	type Tier = {id: Number, name: string, entries: TierImage[]}
 	type SourceType = 'uploaded' | number;
 
-	const tiers: string[] = ['S', 'A', 'B', 'C', 'D'];
-
-	let uploadedImages: TierImage[] = [];
-	let tierItems: TierImage[][] = tiers.map(() => []);
+	let uploadedImages: TierImage[] = $state([]);
+	let tiers: Tier[] = $state([]);
 
 	let draggedImage: TierImage | null = null;
 	let draggedFrom: SourceType | null = null;
 
+	onMount(async () => {
+		tierlistId = data.tierlistId;
+
+		let response = await fetch(`${PUBLIC_API_URL}/tierlist/${tierlistId}`);
+		let tierlist = await response.json();
+		console.log(tierlist);
+		tierlistName = tierlist["Name"];
+		uploadedImages = tierlist["UnassignedEntries"].map((x) => ({id: x["id"], src: `${PUBLIC_API_URL}/images/${x["file_key"]}`}))
+		tiers = tierlist["Tiers"].map((x) => ({id: x["id"], name: x["name"], entries: x["entries"].map((y) => ({id: y["id"], src: `${PUBLIC_API_URL}/images/${y["file_key"]}`}))}))
+	})
+
 	async function handleUpload(event: Event) {
 		const input = event.target as HTMLInputElement;
 		const files = Array.from(input.files ?? []);
+		let newImages = [];
 		for (const file of files) {
 			const formData = new FormData()
 			formData.append('image', file)
 
 			try {
-				const response = await fetch('https://xyquadrat.ch/tiernow/api/upload', {
+				const response = await fetch(`${PUBLIC_API_URL}/tierlist/${tierlistId}/upload`, {
 					method: 'POST',
 					body: formData
 				})
+				const data = await response.json();
+				newImages.push({ id: data, src: `${PUBLIC_API_URL}/images/${data}` })
 			} catch (err) {
 				console.error(err);
 			}
 		}
-		const newImages = files.map((file) => ({
-			id: crypto.randomUUID(),
-			src: URL.createObjectURL(file)
-		}));
 		uploadedImages = [...uploadedImages, ...newImages];
 	}
 
-	function handleDragStart(image: TierImage, from: SourceType) {
+	async function handleDragStart(image: TierImage, from: SourceType) {
 		draggedImage = image;
 		draggedFrom = from;
 	}
 
-	function handleDrop(target: SourceType) {
+	async function handleDrop(target: SourceType) {
 		if (!draggedImage || draggedFrom === null) return;
 
 		if (draggedFrom === 'uploaded') {
 			uploadedImages = uploadedImages.filter((img) => img.id !== draggedImage?.id);
 		} else {
-			tierItems[draggedFrom] = tierItems[draggedFrom].filter((img) => img.id !== draggedImage?.id);
+			tiers[draggedFrom].entries = tiers[draggedFrom].entries.filter((img) => img.id !== draggedImage?.id);
 		}
 
 		if (target === 'uploaded') {
 			uploadedImages = [...uploadedImages, draggedImage];
 		} else {
-			tierItems[target] = [...tierItems[target], draggedImage];
+			tiers[target].entries = [...tiers[target].entries, draggedImage];
 		}
+
+		const response = await fetch(`${PUBLIC_API_URL}/tierlist/${tierlistId}/move`, 
+			{
+				method: "POST", 
+				body: JSON.stringify({"TierID": target === 'uploaded' ? null : tiers[target].id, "ID": draggedImage?.id})
+			}
+		)
 
 		draggedImage = null;
 		draggedFrom = null;
@@ -71,22 +96,22 @@
 
 <!-- Tier rows -->
 <div class="mx-4 flex flex-col divide-y-2 border-y-2">
-	{#each tiers as label, i}
+	{#each tiers as tier, i}
 		<div class="grid h-24 grid-cols-[90px_1fr]">
 			<div
 				class="flex items-center justify-center text-xl font-bold text-gray-800 select-none"
 				style="background-color: {getTierColor(i)}"
 			>
-				{label}
+				{tier.name}
 			</div>
 			<div
 				role="list"
-				aria-label="Tier {label} drop zone"
+				aria-label="Tier {tier.name} drop zone"
 				class="flex items-center gap-2 overflow-x-auto border-l border-black bg-neutral-900 p-2"
 				on:dragover={allowDrop}
 				on:drop={() => handleDrop(i)}
 			>
-				{#each tierItems[i] as image}
+				{#each tier.entries as image}
 					<img
 						src={image.src}
 						alt="tier item"
