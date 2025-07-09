@@ -5,6 +5,8 @@ when:
 steps:
   - name: Build and deploy frontend
     image: docker.io/oven/bun:debian
+    environment:
+      - PUBLIC_API_URL: 'https://xyquadrat.ch/tiernow/api'
     commands:
       - bun install --frozen-lockfile
       - bun run build
