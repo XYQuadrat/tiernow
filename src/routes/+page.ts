@@ -9,7 +9,7 @@ async function getNewTierlistURL() : Promise<string> {
 		body: JSON.stringify({ 'uuid': uuid, 'name': 'New Tierlist' })
 	})
 
-	return `/${uuid}`;
+	return `${PUBLIC_WWW_URL}/${uuid}`;
 }
 
 export async function load() {
