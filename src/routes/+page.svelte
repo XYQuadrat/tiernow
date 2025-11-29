@@ -96,16 +96,25 @@
 			>
 				{#if tierItems[tierLevelIndex].length === 0}
 					<div
-						class="drop-target full-drop-target"
+						class="full-drop-target"
+						on:dragenter={() => handleEnter(tierLevelIndex, 0)}
+						on:dragleave={() => handleLeave(tierLevelIndex, 0)}
 						on:dragover={allowDrop}
 						on:drop={() => handleDrop(tierLevelIndex, 0)}
 					>
-						<span class="pointer-events-none text-gray-400 italic select-none">Drop items here...</span>
+						{#if activeDropTarget?.tier === tierLevelIndex && activeDropTarget?.index === 0 && draggedImage}
+							<img
+								src={draggedImage.src}
+								alt="ghost preview"
+								class="h-16 w-16 rounded object-cover opacity-40 pointer-events-none"
+							/>
+						{:else}
+							<span class="pointer-events-none text-gray-400 italic select-none">Drop items here...</span>
+						{/if}
 					</div>
 				{:else}
 					{#each tierItems[tierLevelIndex] as image, index (image.id)}
 						{#if draggedImage?.id !== image.id}
-							<!-- Drop zone before each image unless it's the dragged one -->
 							<div
 								class="drop-target"
 								class:drop-hover={activeDropTarget?.tier === tierLevelIndex && activeDropTarget?.index === index}
@@ -113,8 +122,17 @@
 								on:dragleave={() => handleLeave(tierLevelIndex, index)}
 								on:dragover={allowDrop}
 								on:drop={() => handleDrop(tierLevelIndex, index)}
-							></div>
+							>
+								{#if activeDropTarget?.tier === tierLevelIndex && activeDropTarget?.index === index && draggedImage}
+									<img
+										src={draggedImage.src}
+										alt="ghost preview"
+										class="h-16 w-16 rounded object-cover opacity-40 pointer-events-none"
+									/>
+								{/if}
+							</div>
 						{/if}
+
 						<img
 							src={image.src}
 							alt="tier item"
@@ -125,7 +143,6 @@
 						/>
 					{/each}
 
-					<!-- Final drop target fills remaining space -->
 					<div
 						class="drop-target drop-expand"
 						class:drop-hover={activeDropTarget?.tier === tierLevelIndex && activeDropTarget?.index === tierItems[tierLevelIndex].length}
@@ -133,7 +150,15 @@
 						on:dragleave={() => handleLeave(tierLevelIndex, tierItems[tierLevelIndex].length)}
 						on:dragover={allowDrop}
 						on:drop={() => handleDrop(tierLevelIndex, tierItems[tierLevelIndex].length)}
-					></div>
+					>
+						{#if activeDropTarget?.tier === tierLevelIndex && activeDropTarget?.index === tierItems[tierLevelIndex].length && draggedImage}
+							<img
+								src={draggedImage.src}
+								alt="ghost preview"
+								class="h-16 w-16 rounded object-cover opacity-40 pointer-events-none"
+							/>
+						{/if}
+					</div>
 				{/if}
 			</div>
 		</div>
@@ -159,8 +184,17 @@
 					on:dragleave={() => handleLeave('uploaded', index)}
 					on:dragover={allowDrop}
 					on:drop={() => handleDrop('uploaded', index)}
-				></div>
+				>
+					{#if activeDropTarget?.tier === 'uploaded' && activeDropTarget?.index === index && draggedImage}
+						<img
+							src={draggedImage.src}
+							alt="ghost preview"
+							class="h-16 w-16 rounded object-cover opacity-40 pointer-events-none"
+						/>
+					{/if}
+				</div>
 			{/if}
+
 			<img
 				src={image.src}
 				alt="uploaded item"
@@ -170,6 +204,7 @@
 				on:dragend={handleDragEnd}
 			/>
 		{/each}
+
 		<div
 			class="drop-target"
 			class:drop-hover={activeDropTarget?.tier === 'uploaded' && activeDropTarget?.index === uploadedImages.length}
@@ -177,7 +212,15 @@
 			on:dragleave={() => handleLeave('uploaded', uploadedImages.length)}
 			on:dragover={allowDrop}
 			on:drop={() => handleDrop('uploaded', uploadedImages.length)}
-		></div>
+		>
+			{#if activeDropTarget?.tier === 'uploaded' && activeDropTarget?.index === uploadedImages.length && draggedImage}
+				<img
+					src={draggedImage.src}
+					alt="ghost preview"
+					class="h-16 w-16 rounded object-cover opacity-40 pointer-events-none"
+				/>
+			{/if}
+		</div>
 	</div>
 </div>
 
@@ -203,10 +246,14 @@
 			background-color 0.2s ease,
 			border-color 0.2s ease;
 		flex-shrink: 0;
+
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
 	.drop-hover {
-		width: 24px;
+		width: 64px;
 		background-color: rgba(74, 222, 128, 0.1);
 		border-color: #4ade80;
 	}
@@ -216,9 +263,10 @@
 		height: 100%;
 		display: flex;
 		align-items: center;
-		justify-content: center;
+		justify-content: flex-start;
 		border: 2px dashed #ccc;
 		transition: border-color 0.2s;
+		padding-left: 4px;
 	}
 
 	.full-drop-target:hover {
@@ -227,5 +275,7 @@
 
 	.drop-expand {
 		flex-grow: 1;
+		justify-content: flex-start;
+		padding-left: 4px;
 	}
 </style>
