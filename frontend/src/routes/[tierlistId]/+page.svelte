@@ -43,7 +43,7 @@
 					body: formData
 				})
 				const data = await response.json();
-				newImages.push({ id: data, src: `${PUBLIC_API_URL}/images/${data}` })
+				newImages.push({ id: data["id"], src: `${PUBLIC_API_URL}/images/${data["filename"]}` })
 			} catch (err) {
 				console.error(err);
 			}

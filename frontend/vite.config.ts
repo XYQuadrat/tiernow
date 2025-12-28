@@ -7,6 +7,7 @@ export default defineConfig({
 	server: {
 		watch: {
 			usePolling: true
-		}
+		},
+		allowedHosts: ["tiernow-frontend"],
 	}
 });

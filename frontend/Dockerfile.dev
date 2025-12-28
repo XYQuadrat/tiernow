@@ -1,0 +1,16 @@
+FROM oven/bun:latest
+
+WORKDIR /app
+
+# Copy package.json and bun.lock first to cache dependencies
+COPY package.json bun.lock ./
+
+# Use --frozen-lockfile to ensure reproducible builds
+RUN bun install --frozen-lockfile
+
+COPY . .
+
+EXPOSE 3000
+
+# The command to run the dev server will be in docker-compose.yml
+# CMD ["bun", "run", "dev", "--host", "0.0.0.0"] # This will be overridden by the 'command' in docker-compose.yml

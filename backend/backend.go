@@ -52,7 +52,7 @@ func (storage *StorageInterface) uploadImage(w http.ResponseWriter, r *http.Requ
 
 	vars := mux.Vars(r)
 	uuid := vars["uuid"]
-	_, err = storage.db.UploadImageMetadata(r.Context(), schema.UploadImageMetadataParams{TierlistUuid: uuid, FileKey: fileKey})
+	entry, err := storage.db.UploadImageMetadata(r.Context(), schema.UploadImageMetadataParams{TierlistUuid: uuid, FileKey: fileKey})
 
 	if err != nil {
 		log.Printf("Failed to create file metadata: %v", err)
@@ -60,7 +60,15 @@ func (storage *StorageInterface) uploadImage(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	respondWithJSON(w, http.StatusCreated, fileKey)
+	response := struct{
+		ID	int64 `json:"id"`
+		Filename string `json:"filename"`
+	}{
+		ID: entry.ID,
+		Filename: fileKey,
+	}
+
+	respondWithJSON(w, http.StatusCreated, response)
 }
 
 func uploadToS3(w http.ResponseWriter, file multipart.File, key string, contentType string, minioClient *minio.Client) {
@@ -138,13 +146,13 @@ func (storage *StorageInterface) createTierlist(w http.ResponseWriter, r *http.R
 	}
 
 	params := schema.CreateTierlistParams{
-		Uuid: requestBody.Uuid,
+		Uuid: uuid.NewString(),
 		Name: requestBody.Name,
 	}
 
 	tierlist, err := storage.db.CreateTierlist(r.Context(), params)
 	if err != nil {
-		http.Error(w, "Error: Could not create tierlist", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -153,7 +161,7 @@ func (storage *StorageInterface) createTierlist(w http.ResponseWriter, r *http.R
 	for i := range defaultTiers {
 		log.Default().Print("Creating default tier")
 		tierParams := schema.CreateTierParams{
-			TierlistUuid: requestBody.Uuid,
+			TierlistUuid: params.Uuid,
 			Name:         defaultTiers[i],
 			Order:        int64(i),
 		}
@@ -165,7 +173,7 @@ func (storage *StorageInterface) createTierlist(w http.ResponseWriter, r *http.R
 		}
 	}
 
-	respondWithJSON(w, http.StatusOK, tierlist)
+	respondWithJSON(w, http.StatusCreated, tierlist)
 }
 
 func (storage *StorageInterface) moveImageToTier(w http.ResponseWriter, r *http.Request) {
