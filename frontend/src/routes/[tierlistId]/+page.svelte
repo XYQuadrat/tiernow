@@ -1,15 +1,15 @@
 <script lang="ts">
-	import { onMount } from "svelte";
-	import type { PageProps } from "./$types";
-	import { PUBLIC_API_URL } from "$env/static/public";
+	import { onMount } from 'svelte';
+	import type { PageProps } from './$types';
+	import { PUBLIC_API_URL } from '$env/static/public';
 
-	let { data } : PageProps = $props();
+	let { data }: PageProps = $props();
 
 	let tierlistId: string = $state('');
 	let tierlistName: string = $state('');
 
-	type TierImage = { id: Number, src: string };
-	type Tier = {id: Number, name: string, entries: TierImage[]}
+	type TierImage = { id: Number; src: string };
+	type Tier = { id: Number; name: string; entries: TierImage[] };
 	type SourceType = 'uploaded' | number;
 
 	let uploadedImages: TierImage[] = $state([]);
@@ -23,27 +23,36 @@
 
 		let response = await fetch(`${PUBLIC_API_URL}/tierlist/${tierlistId}`);
 		let tierlist = await response.json();
-		console.log(tierlist);
-		tierlistName = tierlist["Name"];
-		uploadedImages = tierlist["UnassignedEntries"].map((x) => ({id: x["id"], src: `${PUBLIC_API_URL}/images/${x["file_key"]}`}))
-		tiers = tierlist["Tiers"].map((x) => ({id: x["id"], name: x["name"], entries: x["entries"].map((y) => ({id: y["id"], src: `${PUBLIC_API_URL}/images/${y["file_key"]}`}))}))
-	})
+		tierlistName = tierlist['Name'];
+		uploadedImages = tierlist['UnassignedEntries'].map((x) => ({
+			id: x['id'],
+			src: `${PUBLIC_API_URL}/images/${x['file_key']}`
+		}));
+		tiers = tierlist['Tiers'].map((x) => ({
+			id: x['id'],
+			name: x['name'],
+			entries: x['entries'].map((y) => ({
+				id: y['id'],
+				src: `${PUBLIC_API_URL}/images/${y['file_key']}`
+			}))
+		}));
+	});
 
 	async function handleUpload(event: Event) {
 		const input = event.target as HTMLInputElement;
 		const files = Array.from(input.files ?? []);
 		let newImages = [];
 		for (const file of files) {
-			const formData = new FormData()
-			formData.append('image', file)
+			const formData = new FormData();
+			formData.append('image', file);
 
 			try {
 				const response = await fetch(`${PUBLIC_API_URL}/tierlist/${tierlistId}/upload`, {
 					method: 'POST',
 					body: formData
-				})
+				});
 				const data = await response.json();
-				newImages.push({ id: data["id"], src: `${PUBLIC_API_URL}/images/${data["filename"]}` })
+				newImages.push({ id: data['id'], src: `${PUBLIC_API_URL}/images/${data['filename']}` });
 			} catch (err) {
 				console.error(err);
 			}
@@ -62,7 +71,9 @@
 		if (draggedFrom === 'uploaded') {
 			uploadedImages = uploadedImages.filter((img) => img.id !== draggedImage?.id);
 		} else {
-			tiers[draggedFrom].entries = tiers[draggedFrom].entries.filter((img) => img.id !== draggedImage?.id);
+			tiers[draggedFrom].entries = tiers[draggedFrom].entries.filter(
+				(img) => img.id !== draggedImage?.id
+			);
 		}
 
 		if (target === 'uploaded') {
@@ -71,12 +82,13 @@
 			tiers[target].entries = [...tiers[target].entries, draggedImage];
 		}
 
-		const response = await fetch(`${PUBLIC_API_URL}/tierlist/${tierlistId}/move`, 
-			{
-				method: "POST", 
-				body: JSON.stringify({"TierID": target === 'uploaded' ? null : tiers[target].id, "ID": draggedImage?.id})
-			}
-		)
+		const response = await fetch(`${PUBLIC_API_URL}/tierlist/${tierlistId}/move`, {
+			method: 'POST',
+			body: JSON.stringify({
+				TierID: target === 'uploaded' ? null : tiers[target].id,
+				ID: draggedImage?.id
+			})
+		});
 
 		draggedImage = null;
 		draggedFrom = null;
@@ -92,14 +104,14 @@
 	}
 </script>
 
-<h1 class="my-6 text-center text-3xl font-bold select-none">Tierlist Creator</h1>
+<h1 class="my-6 select-none text-center text-3xl font-bold">Tierlist Creator</h1>
 
 <!-- Tier rows -->
 <div class="mx-4 flex flex-col divide-y-2 border-y-2">
 	{#each tiers as tier, i}
 		<div class="grid h-24 grid-cols-[90px_1fr]">
 			<div
-				class="flex items-center justify-center text-xl font-bold text-gray-800 select-none"
+				class="flex select-none items-center justify-center text-xl font-bold text-gray-800"
 				style="background-color: {getTierColor(i)}"
 			>
 				{tier.name}
@@ -108,8 +120,8 @@
 				role="list"
 				aria-label="Tier {tier.name} drop zone"
 				class="flex items-center gap-2 overflow-x-auto border-l border-black bg-neutral-900 p-2"
-				on:dragover={allowDrop}
-				on:drop={() => handleDrop(i)}
+				ondragover={allowDrop}
+				ondrop={() => handleDrop(i)}
 			>
 				{#each tier.entries as image}
 					<img
@@ -117,7 +129,7 @@
 						alt="tier item"
 						class="h-16 w-16 cursor-pointer rounded object-cover"
 						draggable="true"
-						on:dragstart={() => handleDragStart(image, i)}
+						ondragstart={() => handleDragStart(image, i)}
 					/>
 				{:else}
 					<p class="text-gray-500 italic select-none">Drop items here...</p>
@@ -130,11 +142,11 @@
 <div
 	role="list"
 	aria-label="Uploaded items drop zone"
-	class="mx-4 mt-8 mb-6 min-h-[120px] rounded-lg border-2 border-dashed border-gray-400 bg-gray-50 p-4"
-	on:dragover={allowDrop}
-	on:drop={() => handleDrop('uploaded')}
+	class="mx-4 mb-6 mt-8 min-h-[120px] rounded-lg border-2 border-dashed border-gray-400 bg-gray-50 p-4"
+	ondragover={allowDrop}
+	ondrop={() => handleDrop('uploaded')}
 >
-	<h2 class="mb-2 text-lg font-semibold select-none">Uploaded Items</h2>
+	<h2 class="mb-2 select-none text-lg font-semibold">Uploaded Items</h2>
 	<div class="flex flex-wrap gap-4">
 		{#each uploadedImages as image}
 			<img
@@ -142,7 +154,7 @@
 				alt="uploaded item"
 				class="h-16 w-16 cursor-pointer rounded object-cover"
 				draggable="true"
-				on:dragstart={() => handleDragStart(image, 'uploaded')}
+				ondragstart={() => handleDragStart(image, 'uploaded')}
 			/>
 		{:else}
 			<p class="text-gray-500 italic select-none">No images uploaded yet.</p>
@@ -153,9 +165,9 @@
 <!-- Upload button -->
 <div class="mt-8 text-center">
 	<label
-		class="inline-block cursor-pointer rounded bg-sky-500 px-4 py-2 font-bold text-white select-none hover:bg-sky-700"
+		class="inline-block cursor-pointer select-none rounded bg-sky-500 px-4 py-2 font-bold text-white hover:bg-sky-700"
 	>
 		Upload Image
-		<input type="file" accept="image/*" multiple class="hidden" on:change={handleUpload} />
+		<input type="file" accept="image/*" multiple class="hidden" onchange={handleUpload} />
 	</label>
 </div>
