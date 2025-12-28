@@ -12,10 +12,13 @@ import (
 
 	database "example.com/tiernow/db/sqlc"
 
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/sqlite"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/gorilla/mux"
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+	_ "modernc.org/sqlite"
 )
 
 type StorageInterface struct {
@@ -31,17 +34,37 @@ func initializeStorage() *StorageInterface {
 }
 
 func initializeDatabase() *database.Queries {
-	dbConnection, err := sql.Open("sqlite3", "./data.db")
+	dbConnection, err := sql.Open("sqlite", "./data.db")
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	    driver, err := sqlite.WithInstance(dbConnection, &sqlite.Config{})
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    m, err := migrate.NewWithDatabaseInstance(
+        "file://./db/migrations",
+        "sqlite", driver,
+    )
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+        log.Fatal(err)
+    }
+
+    log.Println("Migrations ran successfully")
+
 	return database.New(dbConnection)
 }
 
 func initializeS3() *minio.Client {
-	endpoint := "localhost:3900"
-	accessKeyId := os.Getenv("ACCESS_KEY_ID")
-	secretAccessKey := os.Getenv("SECRET_ACCESS_KEY")
+	endpoint := "tiernow-garage:3900"
+	accessKeyId := os.Getenv("GARAGE_KEY_ID")
+	secretAccessKey := os.Getenv("GARAGE_SECRET_KEY")
 
 	minioClient, err := minio.New(endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(accessKeyId, secretAccessKey, ""),
