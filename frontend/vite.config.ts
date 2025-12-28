@@ -9,5 +9,9 @@ export default defineConfig({
 			usePolling: true
 		},
 		allowedHosts: ["tiernow-frontend"],
+		host: true,
+		hmr: {
+			clientPort: 80,
+		}
 	}
 });
