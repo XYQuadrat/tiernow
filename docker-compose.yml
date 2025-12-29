@@ -39,8 +39,6 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.dev
     container_name: tiernow-frontend
-    ports:
-      - "5173:5173"
     volumes:
       - ./frontend:/app
       - /app/node_modules # Anonymous volume to prevent host's node_modules from overriding
