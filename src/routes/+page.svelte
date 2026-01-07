@@ -117,6 +117,7 @@
 						{#if draggedImage?.id !== image.id}
 							<div
 								class="drop-target"
+								class:is-dragging={draggedImage !== null}
 								class:drop-hover={activeDropTarget?.tier === tierLevelIndex && activeDropTarget?.index === index}
 								on:dragenter={() => handleEnter(tierLevelIndex, index)}
 								on:dragleave={() => handleLeave(tierLevelIndex, index)}
@@ -145,6 +146,7 @@
 
 					<div
 						class="drop-target drop-expand"
+						class:is-dragging={draggedImage !== null}
 						class:drop-hover={activeDropTarget?.tier === tierLevelIndex && activeDropTarget?.index === tierItems[tierLevelIndex].length}
 						on:dragenter={() => handleEnter(tierLevelIndex, tierItems[tierLevelIndex].length)}
 						on:dragleave={() => handleLeave(tierLevelIndex, tierItems[tierLevelIndex].length)}
@@ -179,6 +181,7 @@
 			{#if draggedImage?.id !== image.id}
 				<div
 					class="drop-target"
+					class:is-dragging={draggedImage !== null}
 					class:drop-hover={activeDropTarget?.tier === 'uploaded' && activeDropTarget?.index === index}
 					on:dragenter={() => handleEnter('uploaded', index)}
 					on:dragleave={() => handleLeave('uploaded', index)}
@@ -207,6 +210,7 @@
 
 		<div
 			class="drop-target"
+			class:is-dragging={draggedImage !== null}
 			class:drop-hover={activeDropTarget?.tier === 'uploaded' && activeDropTarget?.index === uploadedImages.length}
 			on:dragenter={() => handleEnter('uploaded', uploadedImages.length)}
 			on:dragleave={() => handleLeave('uploaded', uploadedImages.length)}
@@ -236,6 +240,7 @@
 
 <style>
 	.drop-target {
+		position: relative;
 		width: 4px;
 		min-width: 4px;
 		height: 64px;
@@ -250,6 +255,22 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+	}
+
+	.drop-target.is-dragging::after {
+		content: '';
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 60px;
+		height: 100%;
+		z-index: 20;
+	}
+
+	.drop-target.is-dragging.drop-hover::after {
+		width: 120px;
 	}
 
 	.drop-hover {
