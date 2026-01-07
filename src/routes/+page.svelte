@@ -9,6 +9,7 @@
 
 	let draggedImage: TierImage | null = null;
 	let draggedFrom: SourceType | null = null;
+	let draggedIndex: number | null = null;
 	let activeDropTarget: { tier: SourceType; index: number } | null = null;
 
 	function handleUpload(event: Event) {
@@ -21,14 +22,16 @@
 		uploadedImages = [...uploadedImages, ...newImages];
 	}
 
-	function handleDragStart(image: TierImage, from: SourceType) {
+	function handleDragStart(image: TierImage, from: SourceType, index: number) {
 		draggedImage = image;
 		draggedFrom = from;
+		draggedIndex = index;
 	}
 
 	function handleDragEnd() {
 		draggedImage = null;
 		draggedFrom = null;
+		draggedIndex = null;
 		activeDropTarget = null;
 	}
 
@@ -40,7 +43,7 @@
 		} else {
 			tierItems[draggedFrom] = tierItems[draggedFrom].filter((img) => img.id !== draggedImage?.id);
 		}
-
+		
 		if (target === 'uploaded') {
 			const items = [...uploadedImages];
 			items.splice(index, 0, draggedImage);
@@ -53,6 +56,7 @@
 
 		draggedImage = null;
 		draggedFrom = null;
+		draggedIndex = null;
 		activeDropTarget = null;
 	}
 
@@ -117,13 +121,15 @@
 						<div
 							class="drop-target"
 							class:is-dragging={draggedImage !== null}
-							class:drop-hover={activeDropTarget?.tier === tierLevelIndex && activeDropTarget?.index === index}
+							class:drop-hover={activeDropTarget?.tier === tierLevelIndex &&
+								activeDropTarget?.index === index &&
+								(draggedFrom !== tierLevelIndex || (draggedIndex !== index && draggedIndex !== index - 1))}
 							on:dragenter={() => handleEnter(tierLevelIndex, index)}
 							on:dragleave={() => handleLeave(tierLevelIndex, index)}
 							on:dragover={allowDrop}
 							on:drop={() => handleDrop(tierLevelIndex, index)}
 						>
-							{#if activeDropTarget?.tier === tierLevelIndex && activeDropTarget?.index === index && draggedImage}
+							{#if activeDropTarget?.tier === tierLevelIndex && activeDropTarget?.index === index && draggedImage && (draggedFrom !== tierLevelIndex || (draggedIndex !== index && draggedIndex !== index - 1))}
 								<img
 									src={draggedImage.src}
 									alt="ghost preview"
@@ -137,7 +143,7 @@
 							alt="tier item"
 							class="h-16 w-16 cursor-pointer rounded object-cover"
 							draggable="true"
-							on:dragstart={() => handleDragStart(image, tierLevelIndex)}
+							on:dragstart={() => handleDragStart(image, tierLevelIndex, index)}
 							on:dragend={handleDragEnd}
 						/>
 					{/each}
@@ -145,13 +151,16 @@
 					<div
 						class="drop-target drop-expand"
 						class:is-dragging={draggedImage !== null}
-						class:drop-hover={activeDropTarget?.tier === tierLevelIndex && activeDropTarget?.index === tierItems[tierLevelIndex].length}
+						class:drop-hover={activeDropTarget?.tier === tierLevelIndex &&
+							activeDropTarget?.index === tierItems[tierLevelIndex].length &&
+							(draggedFrom !== tierLevelIndex ||
+								(draggedIndex !== tierItems[tierLevelIndex].length && draggedIndex !== tierItems[tierLevelIndex].length - 1))}
 						on:dragenter={() => handleEnter(tierLevelIndex, tierItems[tierLevelIndex].length)}
 						on:dragleave={() => handleLeave(tierLevelIndex, tierItems[tierLevelIndex].length)}
 						on:dragover={allowDrop}
 						on:drop={() => handleDrop(tierLevelIndex, tierItems[tierLevelIndex].length)}
 					>
-						{#if activeDropTarget?.tier === tierLevelIndex && activeDropTarget?.index === tierItems[tierLevelIndex].length && draggedImage}
+						{#if activeDropTarget?.tier === tierLevelIndex && activeDropTarget?.index === tierItems[tierLevelIndex].length && draggedImage && (draggedFrom !== tierLevelIndex || (draggedIndex !== tierItems[tierLevelIndex].length && draggedIndex !== tierItems[tierLevelIndex].length - 1))}
 							<img
 								src={draggedImage.src}
 								alt="ghost preview"
@@ -179,13 +188,15 @@
 			<div
 				class="drop-target"
 				class:is-dragging={draggedImage !== null}
-				class:drop-hover={activeDropTarget?.tier === 'uploaded' && activeDropTarget?.index === index}
+				class:drop-hover={activeDropTarget?.tier === 'uploaded' &&
+					activeDropTarget?.index === index &&
+					(draggedFrom !== 'uploaded' || (draggedIndex !== index && draggedIndex !== index - 1))}
 				on:dragenter={() => handleEnter('uploaded', index)}
 				on:dragleave={() => handleLeave('uploaded', index)}
 				on:dragover={allowDrop}
 				on:drop={() => handleDrop('uploaded', index)}
 			>
-				{#if activeDropTarget?.tier === 'uploaded' && activeDropTarget?.index === index && draggedImage}
+				{#if activeDropTarget?.tier === 'uploaded' && activeDropTarget?.index === index && draggedImage && (draggedFrom !== 'uploaded' || (draggedIndex !== index && draggedIndex !== index - 1))}
 					<img
 						src={draggedImage.src}
 						alt="ghost preview"
@@ -199,7 +210,7 @@
 				alt="uploaded item"
 				class="h-16 w-16 cursor-pointer rounded object-cover"
 				draggable="true"
-				on:dragstart={() => handleDragStart(image, 'uploaded')}
+				on:dragstart={() => handleDragStart(image, 'uploaded', index)}
 				on:dragend={handleDragEnd}
 			/>
 		{/each}
@@ -207,13 +218,16 @@
 		<div
 			class="drop-target"
 			class:is-dragging={draggedImage !== null}
-			class:drop-hover={activeDropTarget?.tier === 'uploaded' && activeDropTarget?.index === uploadedImages.length}
+			class:drop-hover={activeDropTarget?.tier === 'uploaded' &&
+				activeDropTarget?.index === uploadedImages.length &&
+				(draggedFrom !== 'uploaded' ||
+					(draggedIndex !== uploadedImages.length && draggedIndex !== uploadedImages.length - 1))}
 			on:dragenter={() => handleEnter('uploaded', uploadedImages.length)}
 			on:dragleave={() => handleLeave('uploaded', uploadedImages.length)}
 			on:dragover={allowDrop}
 			on:drop={() => handleDrop('uploaded', uploadedImages.length)}
 		>
-			{#if activeDropTarget?.tier === 'uploaded' && activeDropTarget?.index === uploadedImages.length && draggedImage}
+			{#if activeDropTarget?.tier === 'uploaded' && activeDropTarget?.index === uploadedImages.length && draggedImage && (draggedFrom !== 'uploaded' || (draggedIndex !== uploadedImages.length && draggedIndex !== uploadedImages.length - 1))}
 				<img
 					src={draggedImage.src}
 					alt="ghost preview"
