@@ -114,25 +114,23 @@
 					</div>
 				{:else}
 					{#each tierItems[tierLevelIndex] as image, index (image.id)}
-						{#if draggedImage?.id !== image.id}
-							<div
-								class="drop-target"
-								class:is-dragging={draggedImage !== null}
-								class:drop-hover={activeDropTarget?.tier === tierLevelIndex && activeDropTarget?.index === index}
-								on:dragenter={() => handleEnter(tierLevelIndex, index)}
-								on:dragleave={() => handleLeave(tierLevelIndex, index)}
-								on:dragover={allowDrop}
-								on:drop={() => handleDrop(tierLevelIndex, index)}
-							>
-								{#if activeDropTarget?.tier === tierLevelIndex && activeDropTarget?.index === index && draggedImage}
-									<img
-										src={draggedImage.src}
-										alt="ghost preview"
-										class="h-16 w-16 rounded object-cover opacity-40 pointer-events-none"
-									/>
-								{/if}
-							</div>
-						{/if}
+						<div
+							class="drop-target"
+							class:is-dragging={draggedImage !== null}
+							class:drop-hover={activeDropTarget?.tier === tierLevelIndex && activeDropTarget?.index === index}
+							on:dragenter={() => handleEnter(tierLevelIndex, index)}
+							on:dragleave={() => handleLeave(tierLevelIndex, index)}
+							on:dragover={allowDrop}
+							on:drop={() => handleDrop(tierLevelIndex, index)}
+						>
+							{#if activeDropTarget?.tier === tierLevelIndex && activeDropTarget?.index === index && draggedImage}
+								<img
+									src={draggedImage.src}
+									alt="ghost preview"
+									class="h-16 w-16 rounded object-cover opacity-40 pointer-events-none"
+								/>
+							{/if}
+						</div>
 
 						<img
 							src={image.src}
@@ -178,25 +176,23 @@
 	<h2 class="mb-2 text-lg font-semibold select-none">Uploaded Items</h2>
 	<div class="flex flex-wrap gap-4">
 		{#each uploadedImages as image, index (image.id)}
-			{#if draggedImage?.id !== image.id}
-				<div
-					class="drop-target"
-					class:is-dragging={draggedImage !== null}
-					class:drop-hover={activeDropTarget?.tier === 'uploaded' && activeDropTarget?.index === index}
-					on:dragenter={() => handleEnter('uploaded', index)}
-					on:dragleave={() => handleLeave('uploaded', index)}
-					on:dragover={allowDrop}
-					on:drop={() => handleDrop('uploaded', index)}
-				>
-					{#if activeDropTarget?.tier === 'uploaded' && activeDropTarget?.index === index && draggedImage}
-						<img
-							src={draggedImage.src}
-							alt="ghost preview"
-							class="h-16 w-16 rounded object-cover opacity-40 pointer-events-none"
-						/>
-					{/if}
-				</div>
-			{/if}
+			<div
+				class="drop-target"
+				class:is-dragging={draggedImage !== null}
+				class:drop-hover={activeDropTarget?.tier === 'uploaded' && activeDropTarget?.index === index}
+				on:dragenter={() => handleEnter('uploaded', index)}
+				on:dragleave={() => handleLeave('uploaded', index)}
+				on:dragover={allowDrop}
+				on:drop={() => handleDrop('uploaded', index)}
+			>
+				{#if activeDropTarget?.tier === 'uploaded' && activeDropTarget?.index === index && draggedImage}
+					<img
+						src={draggedImage.src}
+						alt="ghost preview"
+						class="h-16 w-16 rounded object-cover opacity-40 pointer-events-none"
+					/>
+				{/if}
+			</div>
 
 			<img
 				src={image.src}
