@@ -7,6 +7,11 @@ export default defineConfig({
 	server: {
 		watch: {
 			usePolling: true
+		},
+		allowedHosts: ["tiernow-frontend"],
+		host: true,
+		hmr: {
+			clientPort: 80,
 		}
 	}
 });

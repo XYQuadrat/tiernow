@@ -5,8 +5,8 @@ node_modules
 .vercel
 .netlify
 .wrangler
-/.svelte-kit
-/build
+.svelte-kit
+build
 
 # OS
 .DS_Store
@@ -21,3 +21,12 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# DB
+backend/data.db
+
+# Garage
+garage/data/*
+garage/meta/*
+
+backend/tmp/

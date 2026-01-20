@@ -1,0 +1,11 @@
+version: "2"
+sql:
+  - engine: "sqlite"
+    queries: "db/query.sql"
+    # Change the schema to point to the migrations directory
+    schema: "db/migrations"
+    gen:
+      go:
+        package: "database"
+        out: "db/sqlc"
+        emit_pointers_for_null_types: true
